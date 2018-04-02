@@ -8,9 +8,9 @@ from basic import Heat_Controller
 
 # class Tree Map Contoroller
 class Heat_Controller_Complete(Heat_Controller):
-    def __init__(self,atom,hsource,heat_min,heat_max,kernel,EOGkernel):
+    def __init__(self,atom,hsource,heat_min,heat_max,kernel,decay,EOGkernel):
         #super class init
-        super().__init__(atom,hsource,heat_min,heat_max,kernel,EOGkernel)
+        super().__init__(atom,hsource,heat_min,heat_max,kernel,decay,EOGkernel)
         #set edge between nodes and calc edge weight
         self.calc_weight()
         #show graph info and statistics

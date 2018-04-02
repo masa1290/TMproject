@@ -6,16 +6,18 @@ import TMgenerator as tmg
 import networkx as nx
 import numpy as np
 import matplotlib.pyplot as plt
+from pprint import pprint
 #basic
 
 # class Tree Map Contoroller
 class Heat_Controller:
-    def __init__(self,atom,hsource,heat_min,heat_max,kernel,EOGkernel):
+    def __init__(self,atom,hsource,heat_min,heat_max,kernel,decay,EOGkernel):
         self.atom = atom              #atom is set of chunk
         self.hsource = hsource        #hsource is dict: value = heat_source(s fomula), value = its function
         self.min =  heat_min          #heat min
         self.max =  heat_max          #heat max
         self.kernel = kernel          #kernel function
+        self.decay = decay
         self.EOGkernel = EOGkernel    #constant which is used for weight beteween EOG and perfect tree
         self.G = nx.Graph()           #Graph
         self.TL = tmg.generator(atom) #TL is dict : value = s fomula, value = number of chunk
@@ -34,7 +36,7 @@ class Heat_Controller:
         # set weight on edge (except EOG)
         for i in [k for k in self.TL.keys() if k != "EOG"]:
             for j in self.get_neighbors(i):
-                self.G.add_edge(i, j, weight=self.kernel(i,j))
+                self.G.add_edge(i, j, weight=self.kernel(i,j,self.decay))
 
         # set weight on edge which is between EOG and the node that every atom is used
         for i in [k for k,v in self.TL.items() if v == len(self.atom)]:
@@ -45,8 +47,8 @@ class Heat_Controller:
         return [k for k in self.TL.keys() if k != base and k != "EOG"]
 
     def info(self):
-        print(self.G.nodes(data=True))
-        print(self.G.edges(data=True))
+        pprint(list(self.G.nodes(data=True)))
+        pprint(list(self.G.edges(data=True)))
 
     def show(self):
         #output infomation on console
@@ -65,7 +67,7 @@ class Heat_Controller:
         pnode = dict()
         for i in [k for k,v in self.TL.items() if v == len(self.atom)]:
             pnode[i] = nx.get_node_attributes(self.G, "heat")[i]
-        print(pnode)
+        pprint(pnode)
         m = mean(pnode.values())
         v = variance(pnode.values())
         l = min(pnode, key=(lambda x: pnode[x]))
