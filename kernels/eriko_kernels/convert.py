@@ -75,7 +75,7 @@ def append_child(G,parent,S):
 #S_matsuoka = "(A B C (D E))"
 #S_kanagawa = "(A (B) (C) (D (E)))"
 if __name__ == '__main__':
-    S_matsuoka = "(A (B G) C (D E))"
+    S_matsuoka = "(A)"
     print(S_matsuoka)
 
     #convert from s_matsuoka to s_kanagawa

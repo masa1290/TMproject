@@ -4,30 +4,27 @@
 
 import sys
 import math
+import re
+import itertools
 from convert import Sm_to_Sk
 
-s1_set=[]
-s2_set=[]
-hukasa=0
-hukasa_max=0
-
 def subtree_kernel(s1,s2,LAMDA):
-    global s1_set
-    global s2_set
-    s1_set = []
-    s2_set = []
-    #print(s1_set)
-    #print(s2_set)
+    #convert matsuoka's S fomula to kanagawa's S fomula
     s1 = Sm_to_Sk(s1)
     s2 = Sm_to_Sk(s2)
-    s1_array=to_array(s1)#s式から配列の形にする
-    s2_array=to_array(s2)
-    to_subtree_1(s1_array)#配列からサブツリーの集合をつくる
-    to_subtree_2(s2_array)
-    kernel_value=subtree_calculation(s1_set,s2_set,LAMDA)
-    #print "kernel_value:  "+str(kernel_value)
-    return kernel_value
 
+    #s式から配列の形にする
+    s1_array=to_array(s1)
+    s2_array=to_array(s2)
+
+    s1_set = []
+    s2_set = []
+    s1_set = to_subtree(s1_array,s1_set)#配列からサブツリーの集合をつくる
+    s2_set = to_subtree(s2_array,s2_set)
+
+    kernel_value=subtree_calculation(s1_set,s2_set,LAMDA)
+    print ("subtree kernel value:  "+str(kernel_value))
+    return kernel_value
 
 def to_array(s): #出来たと思う
     #print s
@@ -126,11 +123,9 @@ def to_array(s): #出来たと思う
         i+=1
     return s_array
 
-def to_subtree_1(array):#集合setを使う？
-    global s1_set
+def to_subtree(array,s):
     #print array
-
-    s1_set.append(array)
+    s.append(array)
     #print array
     #print s_set
     i=1
@@ -138,46 +133,22 @@ def to_subtree_1(array):#集合setを使う？
         x=array[i]
         if len(x)>1:
             #s_set.append(x)
-            to_subtree_1(x)
+            s = to_subtree(x,s)
             #print x
 
 
         i+=1
 
-    #print s1_set
-
-def to_subtree_2(array):#集合setを使う？
-    global s2_set
-    #print array
-
-    s2_set.append(array)
-    #print array
-    #print s_set
-    i=1
-    while i<len(array):
-        x=array[i]
-        if len(x)>1:
-            #s_set.append(x)
-            to_subtree_2(x)
-        #print x
-
-
-        i+=1
-
-    #print s2_set
+    return s
 
 def subtree_calculation(list_1,list_2,LAMDA):
-    global hukasa_max
-    i=0
+    hukasa_max = 0
     value=0
-    while i<len(list_1):
-        st_1=list_1[i]
-        j=0
-        while j<len(list_2):
-            st_2=list_2[j]
-            if st_1==st_2:
+    for i in list_1:
+        for j in list_2:
+            if i==j:
                 #print("一致")
-                depth_search(st_1,0)
+                depth_search(i,0,hukasa_max)
                 #print deep
                 #hukasa_max=0
                 #print "-------------------"
@@ -189,13 +160,11 @@ def subtree_calculation(list_1,list_2,LAMDA):
                 #print st_1
                 #print st_2
                 value+=1*(LAMDA**deep)
-            j+=1
-        i+=1
+
+
     return value
 
-
-def depth_search(array,hukasa):
-    global hukasa_max
+def depth_search(array,hukasa,hukasa_max):
     hukasa+=1
     #print hukasa
 
@@ -203,7 +172,7 @@ def depth_search(array,hukasa):
 
     while i<len(array):
         #print array[i]
-        new_hukasa=depth_search(array[i],hukasa)
+        new_hukasa=depth_search(array[i],hukasa,hukasa_max)
         if hukasa_max<new_hukasa:
             hukasa_max=new_hukasa
 
@@ -212,36 +181,7 @@ def depth_search(array,hukasa):
         i+=1
     return hukasa
 
-
-
-def start(s1,s2,kk1_txt,pro1_txt,kk2_txt,pro2_txt,LAMDA):
-    global s1_set
-    global s2_set
-    #print s1
-    #print s2
-    kernel_value=main(s1,s2,LAMDA)
-    s1_set=[]
-    s2_set=[]
-    return kernel_value
-
-
-
 if __name__ == '__main__':
-    #s1="(ss (c(d)(a)))"
-    s1="(A B)"
-    s2="(C (A B))"
-    #s1="(n (vadt (nに (a (n (v (nで ) ) ) ) ) (nに (nnの (n ) ) ) (nが ) (aadv ) ) (nを (nnの ) ) (nnは ) (nとは (nnの (nの ) ) ) (d ) )"
-
-    #これができない #s式が間違ってる？？
-    #s1="(a (b (c (d (e (f (g ) ) ) ) ) (cc (dd (ee ) ) ) (ccc) ) )"
-
-
-    #s2="(n (vadt (nを ) (jに (nの ) ) (n ) ) (vv (anを (nr ) ) (nは ) (nnに (vncop ) ) ) (vadvnは ) (nnは (v (n (nnに (v ) ) (aか ) (nを ) ) (nが (nて ) (n ) ) (nを (nn (n (nv ) ) ) ) ) ) (nは (v (nnomnに (dはの (nv (jに (aadv (d (nの (v ) ) (nncop ) ) ) ) (nnの ) ) ) ) ) ) (vadt (nに (a (n (v (nで ) ) ) ) ) (nに (nnの (n ) ) ) (nが ) (aadv ) ) (nを (nnの ) ) (nnは ) (nとは (nnの (nの ) ) ) (d ) )"
-    #s1="(s (a (aa (cc)))(b (bb (a (aa (cc)))(b (bb )))))"
-    #s2="(s (a (aa (cc)))(b (bb )))"
-    #s1="(s(a)(b))"
-    #s2="(s(a)(b))"
-    print(subtree_kernel(s1,s2,1))
-
-    #s1="(s (a )(b ) )"
-    #s2="(s (aa )(b ) )"
+    s1 = "(A (B C))"
+    s2 = "(A (B C))"
+    subtree_kernel(s1,s2,1)
