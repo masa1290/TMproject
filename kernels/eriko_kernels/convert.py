@@ -61,9 +61,9 @@ def Sm_to_Sk(S):
     return S
 
 def append_child(G,parent,S):
-    t = S.find(parent)
+    t = S.find(parent) + len(parent)
     for child in list(G[parent].keys()):
-        S = S[0:t+1] + " (" + child + ")" + S[t+1:]
+        S = S[0:t] + " (" + child + ")" + S[t:]
         S = append_child(G,child,S)
     return S
 
@@ -75,7 +75,7 @@ def append_child(G,parent,S):
 #S_matsuoka = "(A B C (D E))"
 #S_kanagawa = "(A (B) (C) (D (E)))"
 if __name__ == '__main__':
-    S_matsuoka = "(A)"
+    S_matsuoka = "(殴った (太郎は 花子を))"
     print(S_matsuoka)
 
     #convert from s_matsuoka to s_kanagawa

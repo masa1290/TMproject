@@ -17,11 +17,12 @@ def subset_tree_kernel(s1,s2,LAMDA):
     s1_array=to_array(s1)
     s2_array=to_array(s2)
 
+
     s1_set = to_subset_tree(s1_array)#配列からサブツリーの集合をつくる
     s2_set = to_subset_tree(s2_array)
 
-    print(s1_set)
-    print(s2_set)
+    #print(s1_set)
+    #print(s2_set)
 
     kernel_value=subtree_calculation(s1_set,s2_set,LAMDA)
     print ("subset tree kernel value:  "+str(kernel_value))
@@ -230,7 +231,10 @@ def subtree_calculation(list_1,list_2,LAMDA):
     value=0
     for i in list_1:
         for j in list_2:
-            if i==j:
+            a = list_to_set(i)
+            b = list_to_set(j)
+            #compare as a frozenset (don't consider order if they are same as set
+            if a==b:
 
                 depth_search(i,0,hukasa_max)
 
@@ -243,6 +247,18 @@ def subtree_calculation(list_1,list_2,LAMDA):
 
     return value
 
+def list_to_set(thislist):
+    myset = set()
+    iter_thislist = iter(thislist)
+    #ignore first token and go next
+    myset.add(next(iter_thislist))
+
+    for child in iter_thislist:
+        if len(child) == 1:
+            myset.add(frozenset(child))
+        else: myset.add(list_to_set(child))
+
+    return frozenset(myset)
 
 def depth_search(array,hukasa,hukasa_max):
     hukasa+=1
@@ -262,6 +278,6 @@ def depth_search(array,hukasa,hukasa_max):
     return hukasa
 
 if __name__ == '__main__':
-    s1 = "(A)"
-    s2 = "(B A)"
+    s1 = "(殴った 太郎は 花子を)"
+    s2 = "(殴った 花子を 太郎は)"
     subset_tree_kernel(s1,s2,1)
