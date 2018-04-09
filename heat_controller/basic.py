@@ -59,7 +59,7 @@ class Heat_Controller:
 
         #visualize heat of node
         plt.clf()
-        nx.draw(self.G, cmap=plt.get_cmap('rainbow'), node_color=self.set_color(), with_labels=True ,edgelist = [], pos = self.npos)
+        #nx.draw(self.G, cmap=plt.get_cmap('rainbow'), node_color=self.set_color(), with_labels=True ,edgelist = [], pos = self.npos)
         plt.pause(.02)
 
     # calc varicance of heat on the node that every atom is used
@@ -70,10 +70,12 @@ class Heat_Controller:
         pprint(pnode)
         m = mean(pnode.values())
         v = variance(pnode.values())
-        l = min(pnode, key=(lambda x: pnode[x]))
+        t = min(pnode, key=(lambda x: pnode[x]))
+        l = min(pnode.values())
         print('平均: {0:.2f}'.format(m))
         print('分散: {0:.2f}'.format(v))
-        print("最低温木: " + l)
+        print("最低温: {0:.2f}".format(l))
+        print("最低温木: " + t)
 
 
     def set_color(self):

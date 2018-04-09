@@ -14,12 +14,12 @@ class Heat_Controller_Hierarchy(Heat_Controller):
         #set edge between nodes and calc edge weight
         self.calc_weight()
         #show graph info and statistics
-        self.info()
-        self.calc_stat()
+        #self.info()
+        #self.calc_stat()
         #visualize heat of node
         self.npos = nx.kamada_kawai_layout(self.G) #node position for matplotlib
-        nx.draw(self.G, cmap=plt.get_cmap('rainbow'), node_color=self.set_color(), with_labels=True, pos = self.npos)
-        plt.show()
+        #nx.draw(self.G, cmap=plt.get_cmap('rainbow'), node_color=self.set_color(), with_labels=True, pos = self.npos)
+
 
 
     #neighbor is upnode or downnode: ex. a->b's neighbor is a and a->b->c
@@ -40,7 +40,7 @@ class Heat_Controller_Hierarchy(Heat_Controller):
         print(self.G.nodes(data=True))
 
         #calc stat info
-        self.calc_stat()
+        #self.calc_stat()
 
         #visualize heat of node
         plt.clf()

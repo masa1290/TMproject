@@ -6,6 +6,7 @@ import sys
 import math
 import re
 import itertools
+from copy import deepcopy
 from convert import Sm_to_Sk
 
 def subset_tree_kernel(s1,s2,LAMDA):
@@ -25,7 +26,7 @@ def subset_tree_kernel(s1,s2,LAMDA):
     #print(s2_set)
 
     kernel_value=subtree_calculation(s1_set,s2_set,LAMDA)
-    print ("subset tree kernel value:  "+str(kernel_value))
+    #print ("subset tree kernel value:  "+str(kernel_value))
     return kernel_value
 
 def to_array(s): #出来たと思う
@@ -111,8 +112,6 @@ def make_subset_tree(master,subtree):
             ###kこのコードがkey=lenでうまくいく自信はない！！
             a.sort(key=len)
             a.reverse()
-
-
             d = {}
             d["normal"]= list(a)
             d["inside"]= list()
@@ -122,7 +121,6 @@ def make_subset_tree(master,subtree):
     groups = make_inside_tree(groups)
 
     master_subset = make_master_subset(master,groups)
-
 
     #add subtree and inside tree
     for d in groups:
@@ -147,10 +145,54 @@ def make_inside_tree(groups):
 
     return groups
 
+def make_a_substracted_tree(master,groups,comb):
+    comb = list(comb)
+    #print(comb)
+    every_list = []
+    one_list = []
+    make_combination_list(master,groups,comb,one_list,every_list)
+    #print(every_list)
+    substracted_tree = []
+    for tree_list in every_list:
+        tmp = list(master)
+        for tree in tree_list:
+            tmp = substract_tree(tmp,tree)
+        substracted_tree.append(tmp)
+
+    #print(substracted_tree)
+    return substracted_tree
+
+def make_combination_list(master,groups,comb,this_list,every_list):
+    #print("this list: " + str(this_list))
+    #print("rest: " + str(comb))
+    if comb:
+        for tree in groups[comb[0]]["normal"]:
+            this_list.append(tree)
+            make_combination_list(master,groups,comb[1:],this_list,every_list)
+            this_list.remove(tree)
+    else:
+        #print(this_list)
+        #this_listは後に変化するので,idの違うオブジェクトを作成しないと,every_listにappendされた値も変化してしまう
+        a = list(this_list)
+        every_list.append(a)
+    return
+
+
 #今はグループが二つまでだと仮定する、、
 def make_master_subset(master,groups):
     master_subset = list()
     s = list(range(1,len(master)))
+    #print(master)
+    #print(groups)
+    num_groups = len(groups)
+    for pic_num in range(1,num_groups+1):
+        comb_list = list(itertools.combinations(range(num_groups),pic_num))
+        #print(comb_list)
+        for comb in comb_list:
+            master_subset.extend(make_a_substracted_tree(master,groups,comb))
+
+
+    '''
     if len(groups) == 1:
         for tree2 in groups[0]["normal"]:
             master_subset.append(substract_tree(master,tree2))
@@ -162,6 +204,7 @@ def make_master_subset(master,groups):
             master_subset.append(tree)
             for tree2 in groups[0]["normal"]:
                 master_subset.append(substract_tree(tree,tree2))
+    '''
 
     return master_subset
 
@@ -278,6 +321,6 @@ def depth_search(array,hukasa,hukasa_max):
     return hukasa
 
 if __name__ == '__main__':
-    s1 = "(殴った 太郎は 花子を)"
-    s2 = "(殴った 花子を 太郎は)"
+    s1 = "(A B (C G) (D F))"
+    s2 = "(A B (C G) (D F))"
     subset_tree_kernel(s1,s2,1)
